@@ -1,0 +1,44 @@
+﻿@inject AuthenticationStateProvider authprovider
+@inject NavigationManager navigationManager
+<CascadingBlazoredModal Position="ModalPosition.Middle" HideCloseButton="false" DisableBackgroundCancel="true" AnimationType="ModalAnimationType.FadeInOut">
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    @if (context.User.Identity?.IsAuthenticated != true)
+                    {
+                        <LoginRedirect />
+                    }
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <CascadingAuthenticationState>
+                <PageTitle>Not found</PageTitle>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p role="alert">Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </CascadingAuthenticationState>
+        </NotFound>
+    </Router>
+</CascadingBlazoredModal>
+
+@code {
+
+    private async Task OnNavigateAsync()
+    {
+        //Revisamos el estado de la autenticacion
+        var authstate = await authprovider.GetAuthenticationStateAsync();
+
+        var user = authstate.User;
+        var name = user.Identity.Name;
+
+
+        //si el valor es nulo se envia al login
+        if (name == null)
+        {
+            navigationManager.NavigateTo("/login");
+        }
+    }
+}

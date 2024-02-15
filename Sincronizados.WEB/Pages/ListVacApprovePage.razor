@@ -1,0 +1,213 @@
+﻿@inject IJSRuntime JSRuntime
+@inject IRepository repository
+@inject SweetAlertService sweetAlertService
+@inject AuthenticationStateProvider authprovider
+@inject IStringLocalizer<Sincronizados.WEB.Resources.Resource> localizer
+@inject NavigationManager navigationManager
+@inject HttpClient Http
+@inject DialogService DialogService
+@inject IModalService modalservice
+
+@page "/listvacapprovepage"
+
+<PageTitle>@localizer["ApprovalVacation"]</PageTitle>
+
+
+<div class="row">
+
+    <RadzenDataList WrapItems="true" AllowPaging="false" Data="@_emplVacationRequests" TItem="EmplVacationRequest">
+        <Template Context="vacation">
+            <RadzenCard Style="width:300px;">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                    <RadzenImage Path="images/circle-user-solid.svg" Style="width: 80px; height:80px; border-radius: 50%" />
+                    <RadzenStack Gap="0">
+                         <RadzenRow>                     
+                            <RadzenColumn class="rz-p-1" Style="width:200px">
+                                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-my-0">@localizer["ApplicationNumber"]</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@(vacation.IdVaction)</b></RadzenText>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn class="rz-p-1">
+                                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">@localizer["SDate"]</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@(vacation.StarDateVacation.ToShortDateString())</b></RadzenText>
+                            </RadzenColumn>
+                            <RadzenColumn class="rz-p-1">
+                                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-my-0">@localizer["FDate"]</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@(vacation.EndDateVacation.ToShortDateString())</b></RadzenText>
+                                </RadzenColumn>
+                        </RadzenRow>
+                          <RadzenRow>
+                            <RadzenColumn class="rz-p-1">
+                                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">@localizer["Vacation"]</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@(vacation.DaysVacation)</b></RadzenText>
+                            </RadzenColumn>
+                            <RadzenColumn class="rz-p-1">
+                                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">@localizer["Balance"]</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@(vacation.VacationOnHad)</b></RadzenText>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenStack>
+                <hr style="border: none; background-color: rgba(0,0,0,.2); height: 1px; margin: 1rem 0;" />
+                <RadzenRow>
+                    <RadzenColumn Size="8">
+                        <b>@(vacation.Name)</b>
+                    </RadzenColumn>
+                   <RadzenColumn Size="4" Class="rz-text-align-end">
+                            @if (vacation.ResponseInt == 10)
+                            {
+                                <RadzenImage Path="images/ic_action_circle_full.png" class="rz-gravatar" />
+                            }
+                            else if (vacation.ResponseInt == 30)
+                            {
+                                <RadzenImage Path="images/ic_action_circle_green.png" class="rz-gravatar" />
+                            }
+                            else
+                            {
+                                <RadzenImage Path="images/ic_action_circle_red.png" class="rz-gravatar" />
+                            }  
+                    </RadzenColumn>
+
+                    <RadzenRow Size="4" Class="rz-text-align-end">
+                        @if (vacation.ResponseInt == 10)
+                        {
+                            <button @onclick="(() => SendRequest(30,vacation.IdVaction))" class="btn btn-primary" style="background-color:#1d2a38">@localizer["ApproveRequest"]</button>
+                            <button @onclick="(() => SendRequest(20,vacation.IdVaction))" class="btn btn-danger">@localizer["RejectRequest"]</button>
+                        }
+                    </RadzenRow>
+                </RadzenRow>
+            </RadzenCard>
+        </Template>
+    </RadzenDataList>
+    <div class="vh-100 d-flex justify-content-center align-items-center">
+        <SpinLoader IsLoading="_isLoading" Spinner="SpinnerType.Wander" Center="true" Color="#fc6500" Size="100px" />
+    </div>
+</div> 
+
+@code {
+    private bool _isLoading = true;
+    private bool _isvisible = false;
+
+    private Users credentialsDTO = new();
+    private ObservableCollection<EmplVacationRequest>? _emplVacationRequests;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authstate = await authprovider.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var name = user.Identity?.Name;
+        int valor = 1;
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            credentialsDTO.Password = "value";
+
+            foreach (var claims in user.Claims)
+            {
+                switch (valor)
+                {
+                    case 3:
+                        credentialsDTO.Username = claims.Value;
+                        break;
+                    case 5:
+                        credentialsDTO.DataAreaId = claims.Value;
+                        break;
+                    case 6:
+                        credentialsDTO.VatNum = claims.Value;
+                        break;
+                    case 8:
+                        credentialsDTO.AxId = claims.Value;
+                        break;
+
+                }
+                valor += 1;
+            }
+
+            ///credentialsDTO.Username = "wvargas";
+            //credentialsDTO.AxId = "wvargas";
+            //  credentialsDTO.VatNum = "113740398";
+
+            await LoadListVatationAprove();
+        }
+
+    }
+
+    private async Task LoadListVatationAprove()
+    {
+        _isLoading = true;
+
+        var responseHttp = await repository.Post<Users, List<EmplVacationRequest>>("api/HRDocument/GetHRListVacAprove", credentialsDTO);
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        else
+        {
+            List<EmplVacationRequest>? list = responseHttp.Response;
+            _emplVacationRequests = new ObservableCollection<EmplVacationRequest>(list);
+        }
+
+        _isLoading = false;
+    }
+
+    public async Task SendRequest(int value, string idvacation)
+    {
+        ObservableCollection<EmplVacationRequest> requestvac;
+        bool action = false;
+
+        requestvac = new ObservableCollection<EmplVacationRequest>(_emplVacationRequests.Where(vac => vac.IdVaction == idvacation));
+
+        var resul = await DialogService.Confirm(@localizer["AreYouSure"], @localizer["ApprovalVacation"], new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+
+        if (resul == true)
+        {
+            if (value == 30)
+            {
+                action = true;
+            }
+            else
+            {
+                var reasontxt="";
+
+                reasontxt = await DialogService.OpenAsync<Reason>("", new Dictionary<string, object>() { { "ReazonTxt", reasontxt } }, null);
+
+                if(reasontxt != null)
+                {
+                    requestvac[0].RejectComment = reasontxt;
+                    action = true;
+                }
+            }
+        }
+
+        if (action == true)
+        {
+            requestvac[0].ResponseInt = value;
+
+            var responseHttp = await repository.Post<EmplVacationRequest>("api/HRDocument/UpdateReqVacation", requestvac[0]);
+            var responseHttp1 = await repository.Post<EmplVacationRequest>("api/Account/SendClientPushVacMsg", requestvac[0]);
+
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            else if(responseHttp1.Error)
+            {
+                var message = await responseHttp1.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            else
+            {
+                await sweetAlertService.FireAsync(@localizer["Correct"], @localizer["RegisterRequest"], SweetAlertIcon.Success);
+                await InvokeAsync(() => { StateHasChanged(); });
+            }
+        }
+    }
+}

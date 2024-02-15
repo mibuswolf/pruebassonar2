@@ -1,0 +1,494 @@
+﻿@inject IJSRuntime JSRuntime
+@inject IRepository repository
+@inject SweetAlertService sweetAlertService
+@inject AuthenticationStateProvider authprovider
+@inject IStringLocalizer<Sincronizados.WEB.Resources.Resource> localizer
+@inject NavigationManager navigationManager
+@inject HttpClient Http
+@inject DialogService DialogService
+@inject IModalService modalservice
+@inject IPublicUserDto publicuserdto;
+
+@using Newtonsoft.Json;
+@using Syncfusion.Pdf
+@using Syncfusion.Pdf.Grid;
+@using Syncfusion.Drawing;
+@using Syncfusion.Pdf.Graphics;
+
+@page "/"
+
+
+<PageTitle>@localizer["EmployeeServices"]</PageTitle>
+
+@* <h1>@localizer["EmployeeServices"]</h1> *@
+
+@* <SpinLoader IsLoading="_isLoading" Spinner="SpinnerType.Wander" Center="true" Color="#fc6500" Size="100px" style="position: absolute;  top: 50%;  left: 65%;  transform: translate(-50%, -50%);" />
+ *@
+@* Estadisticas  *@  
+<div class="row cardsStadistics">
+    <div class="col colStadistic">
+        <div class="card" style="border-color:#fc6500">
+            <div class="card-body">
+                <img src="images/arrow-trend-up-solid.svg" />
+                <h6 style="color:#CCDC3A; font-weight:bold">@localizer["DaysAccumulated"] @_emplVacations?[0].RigthDays</h6>
+            </div>
+        </div>
+    </div>
+    <div class="col colStadistic">
+        <div class="card" style="border-color:#fc6500">
+            <div class="card-body">
+                <img src="images/arrow-trend-down-solid.svg" />
+                <h6 style="color:red; font-weight:bold">@localizer["DaysEnjoyed"] @_emplVacations?[0].EndjoyDays</h6>
+
+            </div>
+        </div>
+    </div>
+    <div class="col colStadistic">
+        <div class="card" style="border-color:#fc6500">
+            <div class="card-body">
+                <img src="images/clock-rotate-left-solid.svg" />
+                <h6 style="color:darkgreen; font-weight:bold">@localizer["DaysPending"] @_emplVacations?[0].PendingDays</h6>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@* Grids y botones para menu *@
+<div class="row cardsMenu">
+    <div class="col col-lg-3 colMenu">
+        <div class="card" style="border-color:#fc6500">
+                <div class="card-body">
+                <h5 class="card-title">@localizer["Certificates"]</h5>
+                    <img src="images/ic_ob_constancias.png" />
+                <button @onclick="ShowRequestDocumentPage" class="btn btn-primary" style="background-color:#1d2a38">@localizer["RequestDocuments"]</button>
+                </div>
+            </div>
+        <div class="card" style="border-color:#fc6500">
+                <div class="card-body">
+                <h5 class="card-title">@localizer["HolidayInformation"]</h5>
+                <img src="images/ic_ob_vacaciones.png" />
+                <button @onclick="ShowRequestVacationPage" class="btn btn-primary" style="background-color:#1d2a38">@localizer["VacationRequest"]</button>
+               @*  <button @onclick="SubscriptionAsync" class="btn btn-primary" style="background-color:#1d2a38">activar notificacion</button> *@
+                </div>
+            </div>
+
+      @*   <div class="card" style="border-color:#fc6500">
+                <div class="card-body">
+                <h5 class="card-title">@localizer["RenewCard"]</h5>
+                    <img src="images/ic_ob_carnet.png" />
+                    <a href="#" class="btn btn-primary" >Go somewhere</a>
+                </div>
+            </div> *@
+
+     </div>
+    <div class="col col-lg-9 colMenu" style="position: relative;">
+        <SpinLoader IsLoading="_isLoading" Spinner="SpinnerType.Wander" Center="true" Color="#fc6500" Size="100px" style="position: absolute; z-index: 3000; top: 50%;  left:45%;  transform: translate(-50%, -50%);" />
+        <div style="height:100%">
+            <RadzenTabs RenderMode="TabRenderMode.Client" SelectedIndex="1" Style="height:100%;">
+                <Tabs>
+                    <RadzenTabsItem Text="@localizer["DirectCollaborators"]" Visible="@_isvisible" Style="height:100%;">
+                        <RadzenDataGrid AllowColumnResize="true" Density="Density.Compact"  AllowVirtualization="true"
+                                        AllowSorting="true" PageSize="9" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
+                                        Data="@_emplVacationsdirect" TItem="EmplVacation" ColumnWidth="300px" Style="height:100%;">
+                            <HeaderTemplate>
+                                <button class="btn btn-primary" style="background-color:#1d2a38" @onclick="@ExportToPdf" disabled="@_isLoading">@localizer["ReportPrint"]</button>
+                            </HeaderTemplate>
+                            <Columns>
+                                <RadzenDataGridColumn TItem="EmplVacation" Property="EmplName" Title=@localizer["Employee"] Width="160px" />
+                                <RadzenDataGridColumn TItem="EmplVacation" Property="PendingDays" Title=@localizer["DaysPending"] Width="160px" />
+                            </Columns>
+                        </RadzenDataGrid>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@localizer["RequestsMade"]" Style="height:100%;">
+                        <RadzenDataGrid AllowColumnResize="true" Density="Density.Compact"  AllowVirtualization="true"
+                                        AllowSorting="true" PageSize="7" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
+                                        Data="@_emplVacationRequests" TItem="EmplVacationRequest" Style="height:100%;">
+                                <Columns>
+                                <RadzenDataGridColumn TItem="EmplVacationRequest" Property="IdVaction" Title=@localizer["TransId"] Width="150px" />
+                                <RadzenDataGridColumn TItem="EmplVacationRequest" FormatString="{0:dd/MM/yyyy}" Property="StarDateVacation" Title=@localizer["StartDate"] Width="140px" />
+                                <RadzenDataGridColumn TItem="EmplVacationRequest" FormatString="{0:dd/MM/yyyy}" Property="EndDateVacation" Title=@localizer["EndDate"] Width="140px" />
+                                <RadzenDataGridColumn TItem="EmplVacationRequest" Property="DaysVacation" Title=@localizer["Days"] Width="80px" />
+                                    <RadzenDataGridColumn TItem="EmplVacationRequest" Property="ResponseInt" Filterable="false" Width="70px" TextAlign="Radzen.TextAlign.Center">
+                                    <Template Context="data">
+                                        @if (data.ResponseInt == 10)
+                                        {
+                                            <RadzenImage Path="images/ic_action_circle_full.png" class="rz-gravatar" />
+                                        }
+                                        else if (data.ResponseInt == 30)
+                                        {
+                                            <RadzenImage Path="images/ic_action_circle_green.png" class="rz-gravatar" />
+                                        }
+                                        else
+                                        {
+                                            <RadzenImage Path="images/ic_action_circle_red.png" class="rz-gravatar" />
+                                        }
+                                    </Template>
+                                    </RadzenDataGridColumn>
+                                </Columns>
+                        </RadzenDataGrid>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@localizer["VacationHistory"]" Style="height:100%;">
+                        <RadzenDataGrid AllowColumnResize="true" Density="Density.Compact"  AllowVirtualization="true"
+                                        AllowSorting="true" PageSize="7" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
+                                        Data="@_emplVacationHistory" TItem="EmplVacationHistory" Style="height:100%;">
+                            <Columns>
+                                <RadzenDataGridColumn TItem="EmplVacationHistory" Property="TransId" Title=@localizer["TransId"] Width="150px" />
+                                <RadzenDataGridColumn TItem="EmplVacationHistory" FormatString="{0:dd/MM/yyyy}" Property="StarDateVacation" Title=@localizer["StartDate"] Width="140px" />
+                                <RadzenDataGridColumn TItem="EmplVacationHistory" FormatString="{0:dd/MM/yyyy}" Property="EndDateVacation" Title=@localizer["EndDate"] Width="140px" />
+                                <RadzenDataGridColumn TItem="EmplVacationHistory" Property="DaysVacation" Title=@localizer["DaysEnjoyed"] Width="80px" />
+                 
+                            </Columns>
+                        </RadzenDataGrid>
+                     </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </div>
+      
+    </div>
+</div>
+
+
+
+
+@code
+{
+    private bool mobile { get; set; }
+    private bool _isLoading = true;
+    private bool _isvisible = false;
+
+    private ObservableCollection<EmplVacation>? _emplVacations;
+    private ObservableCollection<EmplVacation>? _emplVacationsdirect;
+    private ObservableCollection<EmplVacationRequest>? _emplVacationRequests;
+    private ObservableCollection<EmplVacationHistory>? _emplVacationHistory;
+
+
+    private DataTable ?MainDataTable;
+    // private Users credentialsDTO = new();
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authstate = await authprovider.GetAuthenticationStateAsync();
+
+        if (!string.IsNullOrEmpty(publicuserdto.CredentialsDTO.Username))
+        {
+            await LoadVacationListUser();
+            await LoadVacationListDirect();
+            await LoadVacationRequestListUser();
+            await LoadVacationHistoryListUser();
+        }
+        // var authstate = await authprovider.GetAuthenticationStateAsync();
+        // var user = authstate.User;
+        // var name = user.Identity?.Name;
+        // int valor = 1;
+
+        // if (!string.IsNullOrEmpty(name))
+        // {
+        //     credentialsDTO.Password = "value";
+
+        //     foreach (var claims in user.Claims)
+        //     {
+        //         switch (valor)
+        //         {
+        //             case 3:
+        //                 credentialsDTO.Username = claims.Value;
+        //                 break;
+        //             case 5:
+        //                 credentialsDTO.DataAreaId = claims.Value;
+        //                 break;
+        //             case 6:
+        //                 credentialsDTO.VatNum = claims.Value;
+        //                 break;
+        //             case 8:
+        //                 credentialsDTO.AxId = claims.Value;
+        //                 break;
+
+        //         }
+        //         valor += 1;
+        //     }
+
+        //     await LoadVacationListUser();
+        //     await LoadVacationListDirect();
+        //     await LoadVacationRequestListUser();
+        // }
+
+    }
+
+    private async Task LoadVacationListUser()
+    {
+        _isLoading = true;
+
+        var responseHttp = await repository.Post<Users, List<EmplVacation>>("api/account/VacationList", publicuserdto.CredentialsDTO);
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        else
+        {
+            List<EmplVacation> ?list = responseHttp.Response;
+            _emplVacations = new ObservableCollection<EmplVacation>(list);
+            //   await loginService.LoginAsync(responseHttp.Response!.User.Username);
+
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task LoadVacationHistoryListUser()
+    {
+        _isLoading = true;
+
+        var responseHttp = await repository.Post<Users, List<EmplVacationHistory>>("api/account/VacationHistory", publicuserdto.CredentialsDTO);
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        else
+        {
+            List<EmplVacationHistory>? list = responseHttp.Response;
+            _emplVacationHistory = new ObservableCollection<EmplVacationHistory>(list);
+            //   await loginService.LoginAsync(responseHttp.Response!.User.Username);
+
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task LoadVacationRequestListUser()
+    {
+        _isLoading = true;
+
+        var responseHttp = await repository.Post<Users, List<EmplVacationRequest>>("api/HRDocument/GetUserListVacRequest", publicuserdto.CredentialsDTO);
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        else
+        {
+            List<EmplVacationRequest>? list = responseHttp.Response;
+            _emplVacationRequests = new ObservableCollection<EmplVacationRequest>(list);
+
+            /*  _emplVacationRequests = new ObservableCollection<EmplVacationRequest>(list.Select(c => new EmplVacationRequest
+                      {
+                      IdVaction = c.IdVaction,
+                      DaysVacation = c.DaysVacation,
+                      StarDateVacation = c.StarDateVacation,
+                      EndDateVacation = c.EndDateVacation,
+                      ImageName = c.ResponseInt == 10 ? "ic_action_circle_full" : c.ResponseInt == 30 ? "ic_action_circle_green" : "ic_action_circle_red"
+                  }).ToList());*/
+        }
+
+        _isLoading = false;
+
+
+    }
+
+    private async Task LoadVacationListDirect()
+    {
+        _isLoading = true;
+
+        var responseHttp = await repository.Post<Users, List<EmplVacation>>("api/account/VacationParentList", publicuserdto.CredentialsDTO);
+
+
+        var responseHttp1 = await repository.PostPDF("api/HRDocument/GetReportPDFRecords", publicuserdto.CredentialsDTO);
+
+        //var result = responseHttp1.HttpResponseMessage.Content.ReadAsStringAsync().ToString();
+
+        MainDataTable = (DataTable)JsonConvert.DeserializeObject(responseHttp1.ResultString, (typeof(DataTable)));
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        else
+        {
+            List<EmplVacation>? list = responseHttp.Response;
+            _emplVacationsdirect = new ObservableCollection<EmplVacation>(list);
+            //   await loginService.LoginAsync(responseHttp.Response!.User.Username);
+
+        }
+
+        _isLoading = false;
+
+        if (_emplVacationsdirect.Count > 0)
+        {
+            _isvisible = true;
+        }
+    }
+
+    async void ExportToPdf()
+    {
+
+        _isLoading = true;
+
+        // Create a new PDF document
+        PdfDocument document = new PdfDocument();
+
+        document.PageSettings.Orientation = PdfPageOrientation.Landscape;
+
+        //Add a page to the document
+        PdfPage page = document.Pages.Add();
+
+        //Create PDF graphics for the page
+        PdfGraphics graphics = page.Graphics;
+
+        //Set the standard font
+        PdfFont font = new PdfStandardFont(PdfFontFamily.Helvetica, 20);
+        PdfFont font1 = new PdfStandardFont(PdfFontFamily.TimesRoman, 18, PdfFontStyle.Bold);
+        PdfFont direccion = new PdfStandardFont(PdfFontFamily.TimesRoman, 16, PdfFontStyle.Bold);
+        PdfFont periodo = new PdfStandardFont(PdfFontFamily.TimesRoman, 10, PdfFontStyle.Bold);
+
+        PdfStringFormat sf = new PdfStringFormat();
+        sf.Alignment = PdfTextAlignment.Center;
+
+        HttpClient client = new HttpClient();
+
+        string fileDataPath="";
+
+        switch (publicuserdto.CredentialsDTO.DataAreaId)
+        {
+            case "ATI":
+                fileDataPath = navigationManager.BaseUri + "images/ati.png";
+                break;
+            case "SCO":
+                fileDataPath = navigationManager.BaseUri + "images/siscon.jpg";
+                break;
+            case "NTE":
+                fileDataPath = navigationManager.BaseUri + "images/nova.jpg";
+                break;
+            default:
+                fileDataPath = navigationManager.BaseUri + "images/orbe.png";
+                break;
+        }
+
+        //Get the image stream
+        using HttpResponseMessage response = await client.GetAsync(fileDataPath);
+        response.EnsureSuccessStatusCode();
+        Stream imageStream = await response.Content.ReadAsStreamAsync();
+
+
+        PdfBitmap image = new PdfBitmap(imageStream);
+        //Draw the image
+        graphics.DrawImage(image, 0, 0, 150, 100);
+
+
+        //Draw the text
+        string dirstr, periodostr;
+
+        dirstr = "Costa Rica, San José, Goicoechea, Calle Blancos, de los Tribunales 25 mts este," + "\n" +
+            "contiguo Bomba Montelimar.Apdo. 3653 - 1000";
+
+        periodostr = "Periodo " + DateTime.Now.Year.ToString();
+
+        //   graphics.DrawString(credentialsDTO.NameAlias, font, PdfBrushes.Black, new RectangleF(0, 0, 800, 100), sf);
+        graphics.DrawString(periodostr, font1, PdfBrushes.Black, new RectangleF(0, 20, 800, 100), sf);
+        graphics.DrawString("Informe de saldos de vacaciones", direccion, PdfBrushes.Black, new RectangleF(0, 40, 800, 100), sf);
+        //graphics.DrawString("Componentes El Orbe, S.A.", font1, PdfBrushes.Black, new RectangleF(0, 25, 800, 100), sf);
+        //  graphics.DrawString(dirstr, direccion, PdfBrushes.Black, new RectangleF(0, 45, 800, 100), sf);
+
+
+
+        PdfGrid pdfGrid = new PdfGrid();
+
+        pdfGrid.DataSource = MainDataTable;
+        PdfGridCellStyle headerStyle = new PdfGridCellStyle();
+        PdfGridRow header = pdfGrid.Headers[0];
+
+        PdfGridRowStyle pdfGridRowStyle = new PdfGridRowStyle();
+        pdfGridRowStyle.Font = new PdfStandardFont(PdfFontFamily.TimesRoman, 8);
+
+
+        //Adds cell customizations.
+        for (int i = 0; i < pdfGrid.Rows.Count; i++)
+        {
+            pdfGrid.Rows[i].Style = pdfGridRowStyle;
+        }
+
+        //Adds cell customizations.
+        for (int i = 0; i < header.Cells.Count; i++)
+        {
+            header.Cells[i].StringFormat = new PdfStringFormat(PdfTextAlignment.Center, PdfVerticalAlignment.Middle);
+        }
+
+        header.ApplyStyle(headerStyle);
+        header.Style.Font = new PdfStandardFont(PdfFontFamily.TimesRoman, 7);
+
+        pdfGrid.Style.AllowHorizontalOverflow = true;
+        //Apply built-in table style
+        //pdfGrid.ApplyBuiltinStyle(PdfGridBuiltinStyle.GridTable4Accent1);
+
+        pdfGrid.ApplyBuiltinStyle(PdfGridBuiltinStyle.GridTable4Accent3);
+
+        //Draw grid to the page of PDF document.
+        pdfGrid.Draw(page, new PointF(20, 160));
+
+        //Save the document to the stream
+        MemoryStream stream = new MemoryStream();
+        document.Save(stream);
+
+        _isLoading = false;
+        StateHasChanged();
+
+        JSRuntime.SaveAs("Sample.pdf", stream.ToArray());
+    }
+
+    // void ShowModalCustomLayout()
+    // {
+    //     // var options = new ModalOptions {};
+    //     // var parameters = new ModalParameters();
+    //     // parameters.Add(nameof(CustomBootstrapModal.Message), "Hello Bootstrap modal!!");
+    //     //Modal.Show<CustomBootstrapModal>();
+    //     modalservice.Show<CustomBootstrapModal>();
+    // }
+
+    public async Task ShowRequestDocumentPage()
+    {
+        await DialogService.OpenAsync<HRRequestDocumentPage>(@localizer["RequestDocuments"], null, null);
+    }
+
+
+    public async Task ShowRequestVacationPage()
+    {
+        // await DialogService.Confirm("Are you sure?", "MyTitle", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        var pending = _emplVacations?[0].PendingDays.ToString();
+
+        await DialogService.OpenAsync<HRRequestVacationPage>(@localizer["RequestDocuments"],
+                   new Dictionary<string, object>() { { "PendingDays", pending } }, null);
+
+        await LoadVacationListUser();
+        await LoadVacationListDirect();
+        await LoadVacationRequestListUser();
+        await LoadVacationHistoryListUser();
+
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+
+    // async Task SubscriptionAsync()
+    // {
+
+
+    //     var subscription = await JSRuntime.InvokeAsync<NotificationSubscription>("blazorPushNotifications.requestSubscription");
+    //     if (subscription != null)
+    //     {
+    //         subscription.UserId = publicuserdto.CredentialsDTO.Username; //set user ID
+    //         subscription.VatNum = publicuserdto.CredentialsDTO.VatNum; //set user ID
+    //         var response = await repository.Post<NotificationSubscription>("api/account/subscribe", subscription);
+
+    //     }
+       
+    // }
+}

@@ -1,0 +1,113 @@
+﻿@inject IStringLocalizer<Sincronizados.WEB.Resources.Resource> localizer
+@inject DialogService DialogService
+@inject SweetAlertService sweetAlertService
+@inject AuthenticationStateProvider authprovider
+@inject IRepository repository
+@page "/hrrequestdocument"
+
+<SpinLoader IsLoading="_isLoading" Spinner="SpinnerType.Wander" Center="true" Color="#fc6500" Size="100px" style="position: absolute;  top: 50%;  left: 65%;  transform: translate(-50%, -50%);" />
+
+<div>
+    <h5 class="card-title">@localizer["SelectDocument"]</h5>
+   
+    <br />
+
+    <InputRadioGroup @bind-Value="@valueradio">
+        <div class="form-check" style="font-weight:bold">
+            <InputRadio Value="0"/> @localizer["Doc1"]
+        </div>
+        <div class="form-check" style="font-weight:bold">
+            <InputRadio Value="1"/> @localizer["Doc2"]
+        </div>
+        <div class="form-check" style="font-weight:bold">
+            <InputRadio Value="2"/> @localizer["Doc3"]
+        </div>
+        <div class="form-check" style="font-weight:bold">
+            <InputRadio Value="3" /> @localizer["Doc4"]
+        </div>
+    </InputRadioGroup>
+    
+    <br />
+
+    <button @onclick="SendRequestDocument" class="btn btn-primary" style="background-color:#fc6500">@localizer["RequestDocument"]</button>
+
+</div>
+
+@code {
+    // [CascadingParameter] public IModalService ?Modal { get; set; }
+
+    private Users credentialsDTO = new();
+    private HRRequestDocument hRRequestDocument = new();
+    private bool _isLoading = false;
+
+    Boolean radio1 = false;
+    int valueradio = -1;
+
+    protected async override Task OnInitializedAsync()
+    {
+        //Obtenemos la informacion del usuario activo
+        var authstate = await authprovider.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var name = user.Identity?.Name;
+        int valor = 1;
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            credentialsDTO.Password = "value";
+
+            foreach (var claims in user.Claims)
+            {
+                switch (valor)
+                {
+                    case 3:
+                        credentialsDTO.Username = claims.Value;
+                        break;
+                    case 4:
+                        credentialsDTO.Email = claims.Value;
+                        break;
+                    case 5:
+                        credentialsDTO.DataAreaId = claims.Value;
+                        break;
+                    case 6:
+                        credentialsDTO.VatNum = claims.Value;
+                        break;
+
+                }
+                valor += 1;
+            }
+        }
+    }
+
+    public async Task SendRequestDocument()
+    {
+        if (valueradio == -1)
+        {
+            await sweetAlertService.FireAsync("Error", @localizer["NoDocSelect"], SweetAlertIcon.Error);
+        }
+        else
+        {
+            _isLoading = true;
+
+            hRRequestDocument.VATNum = credentialsDTO.VatNum;
+            hRRequestDocument.Email = credentialsDTO.Email;
+            hRRequestDocument.DataCompany = credentialsDTO.DataAreaId;
+            hRRequestDocument.DocumentType = (int)valueradio;
+            hRRequestDocument.DocuTemplate = ((valueradio == 0) ? "Constancia Laboral" + " " + credentialsDTO.DataAreaId : (valueradio == 1) ? "Constancia Salarial" + " " + credentialsDTO.DataAreaId : (valueradio == 2) ? "Constancia de Ingresos (Vendedores)" : "Comprobante de pago");
+
+            var responseHttp = await repository.Post<HRRequestDocument>("api/HRDocument/InsertReqDocument", hRRequestDocument);
+
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+
+            _isLoading = false;
+
+            await sweetAlertService.FireAsync(@localizer["Correct"], @localizer["DocSendValid"], SweetAlertIcon.Success);
+
+            DialogService.Close();
+        }
+    }
+}

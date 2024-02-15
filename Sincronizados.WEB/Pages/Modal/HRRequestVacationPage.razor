@@ -1,0 +1,204 @@
+﻿@inject IStringLocalizer<Sincronizados.WEB.Resources.Resource> localizer
+@inject DialogService DialogService
+@inject SweetAlertService sweetAlertService
+@inject AuthenticationStateProvider authprovider
+@inject IRepository repository
+@page "/hrrequestvacation"
+
+
+
+
+<div class="container-fluid">
+    <h5 class="card-title">@localizer["VacationRequest"]</h5>
+ 
+    <br />
+    <div class="row">
+        <SpinLoader IsLoading="_isLoading" Spinner="SpinnerType.Wander" Center="true" Color="#fc6500" Size="100px" style="position: absolute;  top: 50%;  left: 50%;  transform: translate(-50%, -50%);" />
+        <div class="col-6">
+         <label class="control-label">@localizer["SDate"]</label>
+            <RadzenDatePicker Style="max-width:125px" @bind-Value=@finicio ShowTime="true" DateFormat="dd-MM-yyyy" />
+        </div>
+        <div class="col-6">
+            <label class="control-label">@localizer["FDate"]</label>
+            <RadzenDatePicker Style="max-width:125px" @bind-Value=@ffinal ShowTime="true" DateFormat="dd-MM-yyyy" />
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-2">
+            <label class="control-label">@localizer["Days"]</label>
+            <InputNumber class="form-control" Style="max-width:85px" @bind-Value=@days min="0" onkeyup="if(this.value<0){this.value= this.value * -1}" />
+        </div>
+        <div class="col-4">
+            <label class="control-label">@localizer["Type"]</label>
+            <InputSelect class="form-select" @bind-Value="@vacationType" >
+                 <option value="0">@localizer["Vacation"]</option>
+                 <option value="1">@localizer["WithPay"]</option>
+            </InputSelect> 
+        </div>
+        <div class="col-2">
+            <label class="control-label">Superior</label>
+            <InputCheckbox style="height:40px;width:40px" DisplayName="dsdsd" @bind-Value=@_superior></InputCheckbox>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-12">
+            <label class="control-label">@localizer["Comments"]</label>    
+            <RadzenTextArea @bind-Value=@_comments class="w-100 h-75" />
+        </div>
+    </div>
+    <br />
+    <button @onclick="SendRequestDocument" class="btn btn-primary" style="background-color:#fc6500">@localizer["Request"]</button>
+</div>
+
+@code {
+
+    #region Parametros
+    [Parameter] public string ?PendingDays { get; set; }
+    #endregion
+ 
+    #region Variables privadas 
+    private Users credentialsDTO = new();
+    private bool _isLoading = false;
+    private bool _superior = false;
+    private int vacationType = -1;
+    private string _comments = "";
+    private DateTime? finicio = DateTime.ParseExact(DateTime.Now.ToString("dd-MM-yyyy"), "dd-MM-yyyy", System.Globalization.CultureInfo.InvariantCulture);
+    private DateTime? ffinal = DateTime.ParseExact(DateTime.Now.ToString("dd-MM-yyyy"), "dd-MM-yyyy", System.Globalization.CultureInfo.InvariantCulture);
+    private int days = 1;
+    #endregion
+
+    #region Metodos sobre escritos
+    protected async override Task OnInitializedAsync()
+    {
+        //Obtenemos la informacion del usuario activo
+        var authstate = await authprovider.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var name = user.Identity?.Name;
+        int valor = 1;
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            credentialsDTO.Password = "value";
+
+            foreach (var claims in user.Claims)
+            {
+                switch (valor)
+                {
+                    case 3:
+                        credentialsDTO.Username = claims.Value;
+                        break;
+                    case 4:
+                        credentialsDTO.Email = claims.Value;
+                        break;
+                    case 5:
+                        credentialsDTO.DataAreaId = claims.Value;
+                        break;
+                    case 6:
+                        credentialsDTO.VatNum = claims.Value;
+                        break;
+                }
+                valor += 1;
+            }
+
+         
+        }
+    }
+    #endregion
+
+    #region Metodos privados
+    private async Task SendRequestDocument()
+    {
+        DateTime _todayd;
+        _isLoading = true;
+
+        _todayd = DateTime.ParseExact(DateTime.Now.ToString("dd-MM-yyyy"), "dd-MM-yyyy", System.Globalization.CultureInfo.InvariantCulture);
+        
+        if (ffinal < finicio || finicio > ffinal)
+        {
+            await sweetAlertService.FireAsync(@localizer["Error"], @localizer["ValidDates"], SweetAlertIcon.Warning); 
+            _isLoading = false;
+            return;
+        }
+        
+       
+
+        if (vacationType == -1)
+        {
+            await sweetAlertService.FireAsync(@localizer["Error"], @localizer["ValidtypeVac"], SweetAlertIcon.Warning);
+            _isLoading = false;
+            return;
+        }
+
+        if (days > Convert.ToDecimal(PendingDays))
+        {
+            await sweetAlertService.FireAsync(@localizer["Error"], @localizer["ValidQtyDays"], SweetAlertIcon.Warning);
+            _isLoading = false;
+            return;
+        }
+
+        var responseHttp = await repository.Post<Users, List<EmplVacationRequest>>("api/HRDocument/GetUserListCountRequest", credentialsDTO);
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            _isLoading = false;
+            return;
+        }
+        else
+        {
+            List<EmplVacationRequest>? list = responseHttp.Response;
+
+            if (list?.Count > 0)
+            {
+                if (days > (Convert.ToDecimal(PendingDays) - list[0].DaysVacation))
+                {
+                    await sweetAlertService.FireAsync(@localizer["Correct"], @localizer["ValidQtyDays"], SweetAlertIcon.Warning);
+                    _isLoading = false;
+                    return;
+
+                }
+            }
+
+            EmplVacationRequest requestsend = new EmplVacationRequest
+                {
+                    Comment = _comments,
+                    VatNum = credentialsDTO.VatNum,
+                    Email = credentialsDTO.Email,
+                    DataAreaId = credentialsDTO.DataAreaId,
+                    VacationType = vacationType,
+                    DaysVacation = days,
+                    VacationOnHad = Convert.ToDecimal(PendingDays),
+                    StarDateVacation = finicio.Value,
+                    EndDateVacation = ffinal.Value,
+                    UserName = credentialsDTO.Username,
+                    SuperiorInstance = _superior == true ? 1 : 0
+
+                };
+
+            var responseHttpSave = await repository.Post<EmplVacationRequest>("api/HRDocument/InsertReqVacation", requestsend);
+
+            if (responseHttpSave.Error)
+            {
+                var message = await responseHttpSave.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync(@localizer["Error"], message, SweetAlertIcon.Error);
+                _isLoading = false;
+                return;
+            }
+            else
+            {
+                await sweetAlertService.FireAsync(@localizer["Correct"], @localizer["RegisterRequest"], SweetAlertIcon.Success);
+            }
+        }
+
+        _isLoading = false;
+
+        DialogService.Close();
+
+ 
+    }
+    #endregion
+
+}

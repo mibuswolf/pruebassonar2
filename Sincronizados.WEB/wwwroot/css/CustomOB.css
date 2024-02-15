@@ -1,0 +1,216 @@
+﻿html, body, #app 
+{
+    height:100%
+}
+
+.page, .main{
+    width: 100%!important;
+}
+
+a:active {
+    color: white;
+}
+
+
+label 
+{
+    font-weight: bold;
+}
+
+.form-control:focus {
+    border-color: #fc6500;
+}
+
+.form-control-login{
+    border-color: #fc6500;
+}
+
+#a_Logaout {
+    color:white;
+}
+
+.checkbox_login {
+    border: 1px solid #fc6500;
+}
+
+#select_div_combo {
+    border: 1px solid #fc6500;
+    border-radius: 5px 5px 5px 5px;
+}
+
+#Login_Image {
+    height: 200px;
+    width: 200px;
+}
+#div_Login_Image {
+    display: flex;
+    justify-content: center;
+}
+
+.nav-item .nav-link {
+    line-height: inherit !important;
+}
+
+.navFooter{
+    position: absolute;
+    bottom: 0px;
+}
+
+span.nav-link, span.nav-link:hover {
+    color: #d7d7d7;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+}
+
+.navFooter .nav-item .nav-link {
+    display: flex;
+    justify-content: center;
+}
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+    #Login_Card 
+    {
+        margin:10%;
+    }
+
+    .navFooter {
+        position: initial;
+    }
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) 
+{
+    #Login_Card {
+        margin: 20% 20% 0 20%;
+    } 
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) 
+{
+    #Login_Card {
+        margin: 5% 25% 0 25%;
+    }
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px)
+{
+    #Login_Card {
+        margin: 5% 35% 0 35%;
+    }
+}
+
+
+
+
+* {
+    box-sizing: border-box;
+}
+
+.cardsStadistics .colStadistic{
+    margin-bottom: 10px;
+}
+
+.cardsStadistics .card-body {
+    display: grid;
+    justify-content: center;
+}
+
+.cardsStadistics .card-body img {
+    margin: 0 auto;
+    width: 30px;
+    height: 30px;
+ }
+
+.cardsMenu .colMenu .card {
+    margin-bottom: 10px;
+}
+
+.cardsMenu .card-body img {
+    width: 70px;
+    height: 70px;
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: row;
+    font-size: 0px;
+    text-align: center;
+}
+
+.flex-item-left {
+    padding: 5px;
+    flex: 10%;
+}
+
+.flex-item-right {
+    padding: 5px;
+    flex: 10%;
+}
+
+.side {
+    flex: 20%;
+    padding: 20px;
+    background-color: white;
+}
+
+/* Main column */
+.main {
+    flex: 70%;
+    background-color: white;
+    padding: 20px;
+}
+
+/* Responsive layout - makes a one column-layout instead of two-column layout */
+@media (max-width: 800px) {
+    .flex-container, .row {
+        flex-direction: column;
+    }
+}
+.radio-item {
+    display: inline-block;
+    position: relative;
+    padding: 0 6px;
+    margin: 10px 0 0;
+}
+
+    .radio-item input[type='radio'] {
+        display: none;
+    }
+
+    .radio-item label {
+        color: #fc6500;
+        font-weight: normal;
+    }
+
+.radio-item label:before {
+    content: " ";
+    display: inline-block;
+    position: relative;
+    top: 5px;
+    margin: 0 5px 0 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 11px;
+    border: 2px solid #fc6500;
+    background-color: transparent;
+}
+
+.radio-item input[type=radio]:checked + label:after {
+    border-radius: 11px;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    top: 9px;
+    left: 10px;
+    content: " ";
+    display: block;
+    background: #004c97;
+}

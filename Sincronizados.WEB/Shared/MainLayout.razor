@@ -1,0 +1,149 @@
+﻿@inherits LayoutComponentBase
+@inject AuthenticationStateProvider authprovider
+@inject NavigationManager navigationManager
+@inject IStringLocalizer<Sincronizados.WEB.Resources.Resource> localizer
+@inject ISuscriptionServices _suscriptionServices;
+@inject IJSRuntime JSRuntime
+@inject IRepository repository
+@inject IPublicUserDto publicuserdto;
+@implements IDisposable;
+
+
+<RadzenComponents />
+
+    <div class="page">
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+
+        <div class="main">
+            <div class="top-row px-4" style="background-color:#1d2a38">
+           
+                <AuthorizeView>
+                    <Authorized>
+@*                         <span class="ml-md-auto" style="color:white">
+                            @context.User.Claims.FirstOrDefault(c => c.Type == "CompanyName")?.Value
+                        </span> *@
+    @*                     <span class="ml-md-auto">
+                            <img style="height:40px;width:40px" src=@_suscriptionServices.SuscriptionImg @onclick="SubscriptionAsync" />
+                         
+                        </span> *@
+                        <span class="ml-md-auto" style="color:white">
+                            Usuario conectado: @context.User.Identity?.Name
+                    @*         <a id="a_Logaout" href="logout">@localizer["Logout"]</a> *@
+                        </span>
+                   
+                    </Authorized>
+                    <NotAuthorized>
+                       <LoginRedirect/>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+
+            <div class="content px-4">
+                @Body
+            </div>
+        </div>
+    </div>
+
+@code {
+
+
+    private Users credentialsDTO = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authstate = await authprovider.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var name = user.Identity?.Name;
+        int valor = 1;
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            credentialsDTO.Password = "value";
+
+            foreach (var claims in user.Claims)
+            {
+                switch (valor)
+                {
+                    case 3:
+                        credentialsDTO.Username = claims.Value;
+                        break;
+                    case 5:
+                        credentialsDTO.DataAreaId = claims.Value;
+                        break;
+                    case 6:
+                        credentialsDTO.VatNum = claims.Value;
+                        break;
+                    case 8:
+                        credentialsDTO.AxId = claims.Value;
+                        break;
+
+                }
+                valor += 1;
+            }
+        }
+
+        credentialsDTO.CompanyName = authstate.User.Claims.FirstOrDefault(c => c.Type == "CompanyName")?.Value;
+
+        publicuserdto.CredentialsDTO = credentialsDTO;
+
+        var subscription = await JSRuntime.InvokeAsync<bool>("blazorPushNotifications.hasActiveSubscription");
+
+        if (subscription == true)
+        {
+            _suscriptionServices.SuscriptionImg = "images/alertActive.png";
+            _suscriptionServices.UpdateSuscription();
+        }
+    }
+
+    async Task SubscriptionAsync()
+    {
+
+
+        var subscription = await JSRuntime.InvokeAsync<NotificationSubscription>("blazorPushNotifications.requestSubscription");
+        if (subscription != null)
+        {
+            subscription.UserId = credentialsDTO.Username; //set user ID
+            subscription.VatNum = credentialsDTO.VatNum; //set user ID
+            var response = await repository.Post<NotificationSubscription>("api/account/subscribe", subscription);
+            _suscriptionServices.SuscriptionImg = "images/alertActive.png";
+            _suscriptionServices.UpdateSuscription();
+
+        }
+
+    }
+
+
+    protected override void OnInitialized()
+    {
+        //  layoutVals.ValuesChanged += () => StateHasChanged();
+        _suscriptionServices.SuscriptionServicesChanged += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        _suscriptionServices.SuscriptionServicesChanged -= StateHasChanged;
+        
+    }
+
+   // public bool subscriptionboolean = false;
+
+    private async Task OnNavigateAsync()
+    {
+           
+        var authstate = await authprovider.GetAuthenticationStateAsync();
+
+        var user = authstate.User;
+        var name = user.Identity.Name;
+
+
+        if (name == null)
+        {
+            //PruebasNotiPWA
+           // navigationManager.NavigateTo("/", true);
+             navigationManager.NavigateTo("/login", true);
+            //navigationManager.NavigateTo("/PruebasNotiPWA", true);
+        }
+    }
+}

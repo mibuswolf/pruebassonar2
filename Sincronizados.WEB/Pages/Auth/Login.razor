@@ -1,0 +1,226 @@
+﻿@layout LoginLayout
+@inject NavigationManager navigationManager
+@inject ILoginService loginService
+@inject IRepository repository
+@inject AuthenticationStateProvider authprovider
+@inject IJSRuntime JSRuntime
+@inject SweetAlertService sweetAlertService
+@inject ILoginService loginservice
+@inject IStringLocalizer<Sincronizados.WEB.Resources.Resource> localizer
+@attribute [AllowAnonymous]
+
+@page "/login"
+
+<PageTitle>Login</PageTitle>
+
+<style>
+    body {
+        background: white !important;
+    }
+</style>
+
+<EditForm Model="credentialsDTO" OnValidSubmit="@LoginAsync">
+    <DataAnnotationsValidator />
+    <FluentValidationValidator />
+        <div class="card bg-light" id="Login_Card" >
+            <div class="card-header justify-content-center">
+                        <span>
+                            <i class="oi oi-account-login" /> Iniciar Sesión
+                        </span>
+             </div>
+                    <div class="card-body" style="background-color: white">
+                        <div class="mb-3" id="div_Login_Image">
+                                <img id="Login_Image" src="images/OBGROUP.png" />
+                        </div>
+                        <div class="mb-3">
+                                    <label>@localizer["Companies"]</label>
+                        <div id="select_div_combo">
+
+                            <SpinLoader IsLoading="_isLoading" Spinner="SpinnerType.Wander" Center="true" Color="#fc6500" Size="100px" style="position: absolute;  top: 50%;  left: 50%;  transform: translate(-50%, -50%);" />
+
+                                    <select class="form-select" @onchange="CompanyChangedAsync">
+                                                @if (_companies is not null)
+                                        {
+                                                    @foreach (var company in _companies)
+                                            {
+                                                <option value="@company.CompanyId">@company.CompanyName</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        <div class="mb-3">
+                                <label>@localizer["Username"]</label>
+                                <div>
+                                    <InputText class="form-control form-control-login" @bind-Value="@credentialsDTO.Username" />
+                                    <ValidationMessage For="@(() => credentialsDTO.Username)" />
+                                </div>
+                            </div>
+                        <div class="mb-3">
+                                <label>@localizer["Password"]</label>
+                            <div>
+                            <InputText type="password" class="form-control form-control-login" @bind-Value="@credentialsDTO.Password" />
+                                    <ValidationMessage For="@(() => credentialsDTO.Password)" />
+                                </div>
+                            </div>
+                        <div class="mb-3">
+                                <div class="mb-3">
+                                    <input id="checkbox_login" class="form-check-input checkbox_login" type="checkbox" value="check"
+                                    @bind="@credentialsDTO.IsEmployee" @onclick="@Toggle">
+                                    <label class="form-check-label" for="checkbox_login">
+                                            @localizer["Employee"]
+                                    </label>
+                                </div>
+                            </div>
+                        <div class="mb-3" hidden="@(!HideLabel)">
+                                    <label>@localizer["IdentificationCard"]</label>
+                            <div>
+                                <InputText class="form-control form-control-login" @bind-Value="@credentialsDTO.VatNum" />
+                                <ValidationMessage For="@(() => credentialsDTO.VatNum)" />
+                            </div>
+                            </div>
+                        <div class="mb-3">
+                <button class="btn btn-primary" style="background-color:#1d2a38" type="submit">@localizer["Login"]</button>
+
+                            </div>
+                    </div>
+            </div>
+ </EditForm>
+
+@code {
+    private List<Companies>? _companies;
+    private string ?_dataareaid;
+    private bool _isLoading = true;
+    private Users credentialsDTO = new();
+    private bool HideLabel { get; set; } = false;
+
+
+    EditContext editContext;
+    ValidationMessageStore messageStore;
+
+
+    private void Toggle()
+    {
+        HideLabel = !HideLabel;
+        credentialsDTO.IsEmployee = HideLabel;
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        // editContext = new EditContext(credentialsDTO);
+        // messageStore = new ValidationMessageStore(editContext);
+        // editContext.OnValidationRequested += OnValidationRequested;
+        // SpinnerService.Show();
+        credentialsDTO.IsEmployee = false;
+        await LoadCompaniesAsync();
+        // SpinnerService.Hide();
+
+        //   var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+        //var unserializedToken = jwtSecurityTokenHandler.ReadJwtToken(token);
+        //forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        //var responseHppt = await repository.Get<Cards>("/cards/listcards");
+
+        //        var responseHttp = await repository.Post < Users,TokenDTO> ("account/login", credentialsDTO);
+
+    }
+
+    private void OnValidationRequested(object sender, ValidationRequestedEventArgs e)
+    {
+        messageStore.Clear();
+        if (HideLabel)
+        {
+            messageStore.Add(() => credentialsDTO.VatNum, "Value is required");
+        }
+    }
+
+    private async Task LoadCompaniesAsync()
+    {
+        _isLoading  = true;
+
+        var responseHppt = await repository.Get<List<Companies>>("api/account/CompanyList");
+
+        if (responseHppt.Error)
+        {
+            var message = await responseHppt.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        _companies = responseHppt.Response;
+
+        if (_companies != null)
+        {
+            _dataareaid = "CEO";
+            credentialsDTO.DataAreaId = _dataareaid;
+            credentialsDTO.CompanyName = "Componentes El Orbe, S.A.";
+        }
+
+        _isLoading = false;
+    }
+
+    private void CompanyChangedAsync(ChangeEventArgs e)
+    {
+        if (_companies != null)
+        {
+            _dataareaid = Convert.ToString(e.Value!);
+
+            var companyname = _companies?.Where(comp => comp.CompanyId == _dataareaid);
+
+            foreach (var company in companyname)
+            {
+                credentialsDTO.CompanyName = company.CompanyName;
+            }
+
+            credentialsDTO.DataAreaId = _dataareaid;
+        }
+
+
+    }
+
+    private async Task LoginAsync()
+    {
+        //Arreglar el tema campos vacios
+        credentialsDTO.Username = credentialsDTO.Username.Trim();
+        credentialsDTO.Password = credentialsDTO.Password.Trim();
+        credentialsDTO.Password = Base64Encode(credentialsDTO.Password);
+
+        var responseHttp = await repository.Post<Users, TokenDTO>("api/account/login", credentialsDTO);
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        else
+        {
+            await loginService.LoginAsync(responseHttp.Response!.Token);
+            //   await loginService.LoginAsync(responseHttp.Response!.User.Username);
+
+        }
+      
+        //  await loginService.LoginAsync(responseHttp.Response!.Token);
+        navigationManager.NavigateTo("/");
+    }
+
+    private string isDevice { get; set; }
+    private bool mobile { get; set; }
+
+    public async Task FindResponsiveness()
+    {
+        mobile = await JSRuntime.InvokeAsync<bool>("isDevice");
+        isDevice = mobile ? "Mobile" : "Desktop";
+
+    }
+
+    public static string Base64Encode(string plainText)
+    {
+        var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+        return System.Convert.ToBase64String(plainTextBytes);
+    }
+}

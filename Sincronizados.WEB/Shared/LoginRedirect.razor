@@ -1,0 +1,10 @@
+﻿@inject NavigationManager _navigationManager
+@attribute [AllowAnonymous]
+@page "/LoginRedirect"
+
+@code {
+    protected override void OnInitialized()
+    {
+        _navigationManager.NavigateTo("/login");
+    }
+}

@@ -1,0 +1,597 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password:</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>User name</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Accept" xml:space="preserve">
+    <value>Accept</value>
+  </data>
+  <data name="UserNameError" xml:space="preserve">
+    <value>You must enter the user!</value>
+  </data>
+  <data name="PasswordError" xml:space="preserve">
+    <value>You must enter the password!</value>
+  </data>
+  <data name="ConnectionError" xml:space="preserve">
+    <value>Check the internet connection</value>
+  </data>
+  <data name="LoginError" xml:space="preserve">
+    <value>Username or password wrong!</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="CompanyError" xml:space="preserve">
+    <value>You must select the company!</value>
+  </data>
+  <data name="Companies" xml:space="preserve">
+    <value>Companies</value>
+  </data>
+  <data name="PurchAprov" xml:space="preserve">
+    <value>Purchases to be approved</value>
+  </data>
+  <data name="AproveOC" xml:space="preserve">
+    <value>Approve purchase order</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Comments</value>
+  </data>
+  <data name="InfoMessage" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="PurchSendValid" xml:space="preserve">
+    <value>The purchase order has already been sent, you must wait for the answer from AX.</value>
+  </data>
+  <data name="PurchOrder" xml:space="preserve">
+    <value>Purchase order</value>
+  </data>
+  <data name="ProviderAccount" xml:space="preserve">
+    <value>Provider account</value>
+  </data>
+  <data name="Currency" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="ProviderName" xml:space="preserve">
+    <value>Providers name</value>
+  </data>
+  <data name="PurchTotal" xml:space="preserve">
+    <value>Purch total</value>
+  </data>
+  <data name="Customer" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="CustomerList" xml:space="preserve">
+    <value>Customer list</value>
+  </data>
+  <data name="PayConditions" xml:space="preserve">
+    <value>Payment conditions</value>
+  </data>
+  <data name="CustomerAccount" xml:space="preserve">
+    <value>Customer account</value>
+  </data>
+  <data name="CustomerName" xml:space="preserve">
+    <value>Customer name</value>
+  </data>
+  <data name="LegalID" xml:space="preserve">
+    <value>Legal ID</value>
+  </data>
+  <data name="Creditlimit" xml:space="preserve">
+    <value>Credit limit</value>
+  </data>
+  <data name="CustomerDetails" xml:space="preserve">
+    <value>Customer Details</value>
+  </data>
+  <data name="SearchCustomer" xml:space="preserve">
+    <value>Search customer</value>
+  </data>
+  <data name="SearchInvoice" xml:space="preserve">
+    <value>Search invoice</value>
+  </data>
+  <data name="Invoice" xml:space="preserve">
+    <value>Invoice</value>
+  </data>
+  <data name="InvoiceDate" xml:space="preserve">
+    <value>Invoice date</value>
+  </data>
+  <data name="DueDate" xml:space="preserve">
+    <value>Due date</value>
+  </data>
+  <data name="InvoiceBalance" xml:space="preserve">
+    <value>Invoice balance</value>
+  </data>
+  <data name="CustomerInvoices" xml:space="preserve">
+    <value>Customer invoices</value>
+  </data>
+  <data name="DaysAccumulated" xml:space="preserve">
+    <value>Accumulated days</value>
+  </data>
+  <data name="DaysEnjoyed" xml:space="preserve">
+    <value>Days Enjoyed</value>
+  </data>
+  <data name="DaysPending" xml:space="preserve">
+    <value>Pending days</value>
+  </data>
+  <data name="HolidayInformation" xml:space="preserve">
+    <value>Holidays</value>
+  </data>
+  <data name="VacationInventory" xml:space="preserve">
+    <value>Vacation inventory</value>
+  </data>
+  <data name="VacationHistory" xml:space="preserve">
+    <value>Vacation history</value>
+  </data>
+  <data name="TransId" xml:space="preserve">
+    <value>Transaction id</value>
+  </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>Final date</value>
+  </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>Start date</value>
+  </data>
+  <data name="InternalTransfer" xml:space="preserve">
+    <value>Internal transfers</value>
+  </data>
+  <data name="SearchTransfer" xml:space="preserve">
+    <value>Search internal transfer</value>
+  </data>
+  <data name="Welcolme" xml:space="preserve">
+    <value>¡Welcolme!</value>
+  </data>
+  <data name="Transfer" xml:space="preserve">
+    <value>Transfer</value>
+  </data>
+  <data name="DocumentDate" xml:space="preserve">
+    <value>Document date</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Account" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="Group" xml:space="preserve">
+    <value>Group</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="AXConectionError" xml:space="preserve">
+    <value>Network integration with AX not available</value>
+  </data>
+  <data name="Correct" xml:space="preserve">
+    <value>Correct</value>
+  </data>
+  <data name="NoUserAX" xml:space="preserve">
+    <value>This user does not have a valid login in Dynamics AX</value>
+  </data>
+  <data name="ApproveTransfer" xml:space="preserve">
+    <value>Approve transfer</value>
+  </data>
+  <data name="ReturnTransfer" xml:space="preserve">
+    <value>Return transfer</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>Quantity</value>
+  </data>
+  <data name="UnitPrice" xml:space="preserve">
+    <value>Unit price</value>
+  </data>
+  <data name="TotalAmount" xml:space="preserve">
+    <value>Total amount</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="Question" xml:space="preserve">
+    <value>Question</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="ProcessTransfer" xml:space="preserve">
+    <value>Do you want to process the selected transfers?</value>
+  </data>
+  <data name="TransferError" xml:space="preserve">
+    <value>No transfers selected</value>
+  </data>
+  <data name="TransferError1" xml:space="preserve">
+    <value>The selected transfers have already been processed</value>
+  </data>
+  <data name="TransferDetails" xml:space="preserve">
+    <value>Transfer details</value>
+  </data>
+  <data name="TransferSendValid" xml:space="preserve">
+    <value>The transfer has already been sent for approval, you must wait for the response from the AX.</value>
+  </data>
+  <data name="EmployeeServices" xml:space="preserve">
+    <value>Employee services</value>
+  </data>
+  <data name="Certificates" xml:space="preserve">
+    <value>Certificates</value>
+  </data>
+  <data name="RequestDocuments" xml:space="preserve">
+    <value>Document request</value>
+  </data>
+  <data name="RequestsInquiries" xml:space="preserve">
+    <value>Requests and inquiries</value>
+  </data>
+  <data name="Doc1" xml:space="preserve">
+    <value>Employment certificate</value>
+  </data>
+  <data name="Doc2" xml:space="preserve">
+    <value>Salarial constance</value>
+  </data>
+  <data name="Doc3" xml:space="preserve">
+    <value>Proof of income</value>
+  </data>
+  <data name="RequestHistory" xml:space="preserve">
+    <value>Request history</value>
+  </data>
+  <data name="RequestDocument" xml:space="preserve">
+    <value>Request document</value>
+  </data>
+  <data name="SelectDocument" xml:space="preserve">
+    <value>Select the document:</value>
+  </data>
+  <data name="NoDocSelect" xml:space="preserve">
+    <value>You must select a document</value>
+  </data>
+  <data name="DocSendValid" xml:space="preserve">
+    <value>The document request has already been sent for approval, you must wait for the AX response.</value>
+  </data>
+  <data name="RequestedDocument" xml:space="preserve">
+    <value>Requested document</value>
+  </data>
+  <data name="ApplicationDate" xml:space="preserve">
+    <value>Application date</value>
+  </data>
+  <data name="ApprovalDate" xml:space="preserve">
+    <value>Approval date</value>
+  </data>
+  <data name="Approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="Doc4" xml:space="preserve">
+    <value>Proof of payment</value>
+  </data>
+  <data name="DirectCollaborators" xml:space="preserve">
+    <value>Direct collaborators</value>
+  </data>
+  <data name="Employee" xml:space="preserve">
+    <value>Employee</value>
+  </data>
+  <data name="MyData" xml:space="preserve">
+    <value>My data</value>
+  </data>
+  <data name="IdentificationCard" xml:space="preserve">
+    <value>Identification card</value>
+  </data>
+  <data name="EmployeeError" xml:space="preserve">
+    <value>The employee does not exist!</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="NewVersion" xml:space="preserve">
+    <value>There is a new version of the application, please update.</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="RenewCard" xml:space="preserve">
+    <value>Renew card</value>
+  </data>
+  <data name="Rep1" xml:space="preserve">
+    <value>Replacement for loss</value>
+  </data>
+  <data name="Rep2" xml:space="preserve">
+    <value>Replacement for impairment</value>
+  </data>
+  <data name="Rep3" xml:space="preserve">
+    <value>Change of company or position</value>
+  </data>
+  <data name="OriginPhotography" xml:space="preserve">
+    <value>Origin of photography?</value>
+  </data>
+  <data name="FromCamera" xml:space="preserve">
+    <value>From the camera</value>
+  </data>
+  <data name="FromGallery" xml:space="preserve">
+    <value>From the gallery</value>
+  </data>
+  <data name="RequestRewCard" xml:space="preserve">
+    <value>Renovation request</value>
+  </data>
+  <data name="RequestCard" xml:space="preserve">
+    <value>Request card</value>
+  </data>
+  <data name="NoCameraSupported" xml:space="preserve">
+    <value>The device does not support access to the camera</value>
+  </data>
+  <data name="NoGallerySupported" xml:space="preserve">
+    <value>The device does not support access to the gallery</value>
+  </data>
+  <data name="CardChReason" xml:space="preserve">
+    <value>Select a reason for the request</value>
+  </data>
+  <data name="PurchDate" xml:space="preserve">
+    <value>Purch date</value>
+  </data>
+  <data name="Vacation" xml:space="preserve">
+    <value>Vacation</value>
+  </data>
+  <data name="WithPay" xml:space="preserve">
+    <value>Leave with salary</value>
+  </data>
+  <data name="ValidDates" xml:space="preserve">
+    <value>Application dates must be valid</value>
+  </data>
+  <data name="ValidtypeVac" xml:space="preserve">
+    <value>You must select the type</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>Days</value>
+  </data>
+  <data name="ValidQtyDays" xml:space="preserve">
+    <value>Number of days greater than the available balance</value>
+  </data>
+  <data name="VacationRequest" xml:space="preserve">
+    <value>Vacation request</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Request" xml:space="preserve">
+    <value>Request</value>
+  </data>
+  <data name="FDate" xml:space="preserve">
+    <value>End</value>
+  </data>
+  <data name="SDate" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="ApprovalVacation" xml:space="preserve">
+    <value>Vacation approval</value>
+  </data>
+  <data name="ApplicationNumber" xml:space="preserve">
+    <value>Application</value>
+  </data>
+  <data name="ApproveRequest" xml:space="preserve">
+    <value>Approve request</value>
+  </data>
+  <data name="RejectRequest" xml:space="preserve">
+    <value>Reject request</value>
+  </data>
+  <data name="RegisterRequest" xml:space="preserve">
+    <value>The request has been registered!</value>
+  </data>
+  <data name="RequestsMade" xml:space="preserve">
+    <value>Requests made</value>
+  </data>
+  <data name="Balance" xml:space="preserve">
+    <value>Balance</value>
+  </data>
+  <data name="PurchaseOrderDetail" xml:space="preserve">
+    <value>Purchase order detail</value>
+  </data>
+  <data name="RejectOC" xml:space="preserve">
+    <value>Reject purchase order</value>
+  </data>
+  <data name="ReasonRejection" xml:space="preserve">
+    <value>Reason for rejection</value>
+  </data>
+  <data name="RejectValidation" xml:space="preserve">
+    <value>You must enter a reason for rejection</value>
+  </data>
+  <data name="Leases" xml:space="preserve">
+    <value>Leases</value>
+  </data>
+  <data name="Balances" xml:space="preserve">
+    <value>Balances</value>
+  </data>
+  <data name="Colones" xml:space="preserve">
+    <value>Colones</value>
+  </data>
+  <data name="Dollars" xml:space="preserve">
+    <value>Dollars</value>
+  </data>
+  <data name="SType" xml:space="preserve">
+    <value>S.Type</value>
+  </data>
+  <data name="RequestAti" xml:space="preserve">
+    <value>Request</value>
+  </data>
+  <data name="Opening" xml:space="preserve">
+    <value>Opening</value>
+  </data>
+  <data name="Expiration" xml:space="preserve">
+    <value>Expiration</value>
+  </data>
+  <data name="Interest" xml:space="preserve">
+    <value>Interest</value>
+  </data>
+  <data name="Term" xml:space="preserve">
+    <value>Term</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="Vresidual" xml:space="preserve">
+    <value>V.residual</value>
+  </data>
+  <data name="ConsolidatedBalance" xml:space="preserve">
+    <value>Consolidated balance</value>
+  </data>
+  <data name="NoImage" xml:space="preserve">
+    <value>No image to send</value>
+  </data>
+  <data name="SendRequest" xml:space="preserve">
+    <value>The request has been sent!</value>
+  </data>
+  <data name="ChanceCompany" xml:space="preserve">
+    <value>Change company</value>
+  </data>
+  <data name="ChanceCompanyCorrect" xml:space="preserve">
+    <value>Change made successfully</value>
+  </data>
+  <data name="IdentificationCardValid" xml:space="preserve">
+    <value>You must enter the identification card</value>
+  </data>
+  <data name="AreYouSure" xml:space="preserve">
+    <value>Are you sure to process this registration?</value>
+  </data>
+  <data name="ReportPrint" xml:space="preserve">
+    <value>Print report</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="PushRegistrationSuccess" xml:space="preserve">
+    <value>The subscription has been completed successfully!</value>
+  </data>
+  <data name="PushDesregistrationSuccess" xml:space="preserve">
+    <value>The subscription has been successfully deleted!</value>
+  </data>
+</root>

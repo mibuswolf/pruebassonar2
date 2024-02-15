@@ -1,0 +1,125 @@
+﻿@inject IJSRuntime JSRuntime
+@inject IRepository repository
+@inject SweetAlertService sweetAlertService
+@inject AuthenticationStateProvider authprovider
+@inject IStringLocalizer<Sincronizados.WEB.Resources.Resource> localizer
+@inject ISuscriptionServices _suscriptionServices;
+@inject IPublicUserDto publicuserdto;
+@inject NotificationService NotificationService
+
+
+
+<div class="top-row ps-3 navbar navbar-dark" style="background-color:#1d2a38">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Sincronizados.Web</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" style="background-color:#1d2a38" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span>@localizer["EmployeeServices"]
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="listvacapprovepage">
+                <span class="oi oi-plus" aria-hidden="true"></span>@localizer["ApprovalVacation"]
+            </NavLink>
+        </div>
+    </nav>
+
+    <nav class="flex-column navFooter">
+        <div class="nav-item px-3">
+            <span class="nav-link">
+                @credentialsDTO.CompanyName
+            </span>
+        </div>
+        <div class="nav-item px-3">
+            <span class="nav-link" style="display: flex;justify-content: center;" @onclick="SubscriptionAsync">
+                <img style="height:40px;width:40px" src=@_suscriptionServices.SuscriptionImg />
+            </span>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="logout">
+                @localizer["Logout"]
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+
+@code {
+    private bool collapseNavMenu = true;
+    private bool subscriptionboolean = false;
+
+    private Users credentialsDTO = new();
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authstate = await authprovider.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var name = user.Identity?.Name;
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            credentialsDTO.CompanyName = authstate.User.Claims.FirstOrDefault(c => c.Type == "CompanyName")?.Value;
+        }
+    }
+
+    async Task SubscriptionAsync()
+    {
+        _suscriptionServices.SuscriptionImg = "images/alertOff.png";
+
+        var subscription = await JSRuntime.InvokeAsync<NotificationSubscription>("blazorPushNotifications.requestSubscription");
+
+        if (subscription != null)
+        {
+            subscription.UserId = publicuserdto.CredentialsDTO.Username; //set user ID
+            subscription.VatNum = publicuserdto.CredentialsDTO.VatNum; //set user ID
+            var response = await repository.Post<NotificationSubscription>("api/account/subscribe", subscription);
+            _suscriptionServices.SuscriptionImg = "images/alertActive.png";
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = @localizer["Success"], Detail = @localizer["PushRegistrationSuccess"], Duration = 4000 });
+           
+            
+        }
+        else
+        {
+           var subscription1  = await JSRuntime.InvokeAsync<Boolean>("blazorPushNotifications.unSubscribe");
+
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = @localizer["Warning"], Detail = @localizer["PushDesregistrationSuccess"], Duration = 4000 });
+        }
+        _suscriptionServices.UpdateSuscription();
+       
+    }
+
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+
+    
+    }
+
+    protected override void OnInitialized()
+    {
+        //  layoutVals.ValuesChanged += () => StateHasChanged();
+        _suscriptionServices.SuscriptionServicesChanged += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        _suscriptionServices.SuscriptionServicesChanged -= StateHasChanged;
+
+    }
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+}

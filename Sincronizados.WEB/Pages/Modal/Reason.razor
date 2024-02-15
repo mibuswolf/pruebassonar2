@@ -1,0 +1,41 @@
+﻿@inject IStringLocalizer<Sincronizados.WEB.Resources.Resource> localizer
+@inject DialogService DialogService
+@inject SweetAlertService sweetAlertService
+@inject AuthenticationStateProvider authprovider
+@inject IRepository repository
+@page "/reason"
+
+<div class="container-fluid">
+    <h5 class="card-title">@localizer["VacationRequest"]</h5>
+
+    <br />
+
+    <div class="row">
+        <div class="col-12">
+            <label class="control-label">@localizer["Comments"]</label>
+            <RadzenTextArea @bind-Value=@ReazonTxt class="w-100 h-75" />
+        </div>
+    </div>
+    <br />
+
+    <button @onclick="SendOk" class="btn btn-primary" style="background-color:#1d2a38">Ok</button>
+    <button @onclick="SendCancel" class="btn btn-danger">Cancel</button>
+</div>
+@code {
+
+    #region Parametros
+    [Parameter] public string? ReazonTxt { get; set; }
+    #endregion
+
+    private string _comments = "";
+
+    private async Task SendOk()
+    {
+        DialogService.Close(ReazonTxt);
+    }
+
+    private async Task SendCancel()
+    {
+        DialogService.Close();
+    }
+}
